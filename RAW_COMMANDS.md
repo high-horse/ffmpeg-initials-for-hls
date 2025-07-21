@@ -155,6 +155,7 @@ ffplay tcp://127.0.0.1:1234
 ```
 Or for UDP
 ```bash
+ffplay -fflags nobuffer -flags low_delay -probesize 32 -analyzeduration 0 udp://127.0.0.1:1234 -autoexit
 ffplay udp://127.0.0.1:1234
 ```
 ** check window session **

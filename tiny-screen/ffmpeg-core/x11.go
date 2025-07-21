@@ -76,6 +76,14 @@ func (t *TinyFfmpegX11) StartStream(protocol, address string) error {
 		"-i", ":1+0,0",
 		"-c:v", "libx264",
 		"-preset", "ultrafast",
+		"-tune", "zerolatency", // Reduce encoding latency
+	  	"-g", "25",                           // keyframe every 25 frames
+	    "-x264-params", "repeat-headers=1", // repeat SPS/PPS before keyframes
+		"-b:v", "3000k",  		// Set bitrate to 3 Mbps
+		"-maxrate", "3000k",
+        "-bufsize", "1000k",	// Smaller buffer size
+        "-flags", "low_delay",  // Low-latency encoding
+        "-max_delay", "0",		// Minimize output buffer
 		"-f", "mpegts",
 		fmt.Sprintf("%s://%s", protocol, address),
 	)
