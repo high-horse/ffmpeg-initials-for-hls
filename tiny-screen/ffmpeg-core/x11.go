@@ -30,6 +30,7 @@ func (t *TinyFfmpegX11) RecordScreen() error {
 		"-f", "pulse",
 		"-ac", "2",
 		"-i", "default",
+		"-y",
 		fmt.Sprintf("%s%s", outputPath, "output.mkv"),
 	)
 
@@ -49,5 +50,40 @@ func (t *TinyFfmpegX11) Resolution() (string, error) {
 		return "", err
 	}
 
-	return strings.TrimSpace(string(output)), nil
+	
+	// Convert output to string and split by lines
+	lines := strings.Split(string(output), "\n")
+	if len(lines) == 0 || lines[0] == "" {
+		return "", fmt.Errorf("no resolution found")
+	}
+
+	// Return the first resolution line trimmed
+	return strings.TrimSpace(lines[0]), nil
+	// return strings.TrimSpace(string(output)), nil
+}
+
+
+func (t *TinyFfmpegX11) StartStream(protocol, address string) error {
+	resolution, err := t.Resolution()
+	if err != nil {
+		return err
+	}
+	
+	cmd := exec.Command("ffmpeg",
+		"-video_size", resolution,
+		"-framerate", "25",
+		"-f", "x11grab",
+		"-i", ":1+0,0",
+		"-c:v", "libx264",
+		"-preset", "ultrafast",
+		"-f", "mpegts",
+		fmt.Sprintf("%s://%s", protocol, address),
+	)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to record screen: %w", err)
+	}
+	fmt.Println(string(output))
+	return nil
 }

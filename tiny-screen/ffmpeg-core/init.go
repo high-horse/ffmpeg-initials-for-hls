@@ -3,6 +3,7 @@ package ffmpegcore
 
 type TinyFfmpegCore interface{
 	RecordScreen() error
+	StartStream(protocol, address string) error
 }
 
 type FFmpegCore interface {

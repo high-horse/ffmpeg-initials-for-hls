@@ -35,6 +35,10 @@ ffmpeg -video_size $(xrandr | grep '*' | awk '{print $1}') -framerate 25 -f x11g
 ffmpeg -video_size $(xdpyinfo -display :1 | grep dimensions | awk '{print $2}') -framerate 25 -f x11grab -i :1+0,0 output.mp4
 ```
 
+** Play recorded video **
+```bash 
+ffplay outputs/output.mp4 -autoexit
+```
 
 ### Stream the recording 
 To stream the captured video from your Ubuntu system using ffmpeg (with the x11grab command you provided) over TCP or UDP, you can modify the ffmpeg command to output to a streaming protocol like MPEG-TS over TCP or UDP. Since you’re using a Go wrapper, I’ll provide the ffmpeg command for streaming and explain how to integrate it into a Go program, assuming the wrapper executes ffmpeg commands. Below, I’ll cover streaming over TCP and UDP, and how to handle this in a Go context.
@@ -152,4 +156,8 @@ ffplay tcp://127.0.0.1:1234
 Or for UDP
 ```bash
 ffplay udp://127.0.0.1:1234
+```
+** check window session **
+```bash
+echo $XDG_SESSION_TYPE
 ```
