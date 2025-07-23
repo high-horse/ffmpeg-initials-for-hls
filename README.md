@@ -33,11 +33,30 @@ ffmpeg -i input.mp4 \
 
 ** Server **
 ```bash
-/project/
-├── main.go
-└── hls/
-    ├── master.m3u8
-    ├──
+package main
+
+import (
+	"log"
+	"net/http"
+)
+
+func main() {
+	// Serve files from the "hls" directory
+	fs := http.FileServer(http.Dir("./hls"))
+
+	// Route all /hls/ URLs to the hls directory
+	http.Handle("/hls/", http.StripPrefix("/hls/", fs))
+
+	// Optional: simple root handler
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "index.html") // or just say hello
+	})
+
+	// Start the server
+	port := ":8080"
+	log.Println("Serving HLS on http://localhost" + port + "/hls/master.m3u8")
+	log.Fatal(http.ListenAndServe(port, nil))
+}
 ```
 
 ** client **
