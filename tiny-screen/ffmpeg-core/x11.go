@@ -62,6 +62,10 @@ func (t *TinyFfmpegX11) Resolution() (string, error) {
 	// return strings.TrimSpace(string(output)), nil
 }
 
+func (t *TinyFfmpegX11) ClickImage()error{
+	return nil
+}
+
 
 func (t *TinyFfmpegX11) StartStream(protocol, address string) error {
 	resolution, err := t.Resolution()
@@ -93,5 +97,42 @@ func (t *TinyFfmpegX11) StartStream(protocol, address string) error {
 		return fmt.Errorf("failed to record screen: %w", err)
 	}
 	fmt.Println(string(output))
+	return nil
+}
+
+func (t *TinyFfmpegX11) CaptureImage(delay int) error {
+    cmdStr := fmt.Sprintf(
+        "sleep %d && ffmpeg -y -f v4l2 -i /dev/video0 -frames:v 1 -update 1 outputs/appCam.jpg",
+        delay,
+    )
+
+    cmd := exec.Command("sh", "-c", cmdStr)
+
+    op, err := cmd.CombinedOutput()
+    if err != nil {
+        return fmt.Errorf("failed to capture screenshot: %w\nOutput: %s", err, string(op))
+    }
+
+    fmt.Println(string(op))
+    return nil
+}
+
+
+func (t *TinyFfmpegX11) CaptureImageOld (delay int)error{
+	// sleep 3 && ffmpeg -y -f v4l2 -i /dev/video0 -frames:v 1 -update 1 outputs/cam.jpg
+
+	cmd := exec.Command(fmt.Sprintf("sleep %d && ffmpeg",delay), 
+		"-y",
+		"if", "v4l2",
+		"-i", "/dev/video0",
+		"-frames:v", "1",
+		"-update", "1",
+		"outputs/appCam.jpg",
+	)
+	op, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to capture screenshot: %w", err)
+	}
+	fmt.Sprintln(string(op))
 	return nil
 }
