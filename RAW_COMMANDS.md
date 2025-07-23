@@ -162,3 +162,22 @@ ffplay udp://127.0.0.1:1234
 ```bash
 echo $XDG_SESSION_TYPE
 ```
+
+** Capture image with in built cam with delay of 3 sec **
+```bash
+sleep 3 && ffmpeg -y -f v4l2 -i /dev/video0 -frames:v 1 -update 1 outputs/cam.jpg
+
+# to draw text use flag 
+# -vf "drawtext=text='%{localtime}':fontcolor=white:fontsize=24:x=10:y=10" 
+# before outputs
+```
+
+** Capture Screenshot **
+```bash
+ffmpeg -y -video_size $(xrandr | grep '*' | awk '{print $1}') -f x11grab -i :1+0,0 -frames:v 1 outputs/screenshot.png
+```
+
+** Merge cam image with screenshot **
+```bash
+ffmpeg -y -i outputs/screenshot.png -i outputs/cam.jpg -filter_complex "overlay=W-w-10:H-h-10" outputs/merge.jpg
+```
