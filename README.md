@@ -4,6 +4,10 @@
 
 ### Basic HLS Export (VOD – Video on Demand) (Basic ffmpeg command)
 ```bash
+# correct
+ffmpeg -i samples/sample-video.mp4 -c copy -hls_time 10 -hls_list_size 0 -start_number 0 -hls_segment_filename outputs/hls/segment_%03d.ts -f hls outputs/hls/sample-hls-op-m3u8
+
+# incorrect
 ffmpeg -i input.mp4 \
        -codec: copy \
        -start_number 0 \
