@@ -6,7 +6,15 @@ import (
 )
 
 func main() {
-	captureImg()
+	// encodeHls()
+	serve()
+}
+
+func encodeHls() {
+	x11 := tf.TinyFfmpegX11{}
+	if err := x11.HlsEncode("input-samples/sample-video.mp4", "", true); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func recordScreen() {
