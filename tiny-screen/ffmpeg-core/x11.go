@@ -2,9 +2,12 @@ package ffmpegcore
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type TinyFfmpegX11 struct {
@@ -157,6 +160,40 @@ func (t *TinyFfmpegX11) HlsEncode(mediaPath, outputPath string, adaptive bool) e
 // 	)
 // 	return nil
 // }
+
+func (t *TinyFfmpegX11) HlsEncodeLocal (mediaPath string) (string, error){
+	// Get media base name without extension: test.mp4 → test
+	baseName := strings.TrimSuffix(filepath.Base(mediaPath), filepath.Ext(mediaPath))
+	
+	// Create output directory: outputs/test_<timestamp>
+	timestamp := time.Now().Unix()
+	outputDir := fmt.Sprintf("outputs/%s_%d", baseName, timestamp)
+	
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return "", fmt.Errorf("failed to create output dir: %w", err)
+	}
+	
+	// Define paths
+	segmentPattern := filepath.Join(outputDir, "segment_%03d.ts")
+	playlistPath := filepath.Join(outputDir, baseName+".m3u8")
+	
+	cmd := exec.Command("ffmpeg",
+		"-i", mediaPath,
+		"-c", "copy",
+		"-hls_time", "10",
+		"-hls_list_size", "0",
+		"-start_number", "0",
+		"-hls_segment_filename", segmentPattern,
+		"-f", "hls", playlistPath,
+	)
+	output, err := cmd.CombinedOutput()
+	fmt.Println(string(output))
+	if err != nil {
+		return "", fmt.Errorf("failed to encode hls: %w", err)
+	}
+	
+	return playlistPath, nil
+}
 
 func hlsEncodeNormal(mediaPath, outputPath string) error {
 	fmt.Println(outputPath)
