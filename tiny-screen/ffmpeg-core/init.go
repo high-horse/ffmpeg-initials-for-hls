@@ -4,6 +4,11 @@ package ffmpegcore
 type TinyFfmpegCore interface{
 	RecordScreen() error
 	StartStream(protocol, address string) error
+	HlsEncodeLocal (mediaPath string) (string, error)
+}
+
+func NewFfmpeg() TinyFfmpegCore {
+	return &TinyFfmpegX11{}
 }
 
 type FFmpegCore interface {

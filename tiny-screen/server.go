@@ -114,7 +114,7 @@ func submitMedia(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to write file: " + err.Error()})
 	}
 	// 3. Encode HLS
-	x11 := tf.TinyFfmpegX11{}
+	x11 := tf.NewFfmpeg()
 	hlsPath, err := x11.HlsEncodeLocal(inputPath)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Failed to encode HLS: " + err.Error()})
